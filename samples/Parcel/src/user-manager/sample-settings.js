@@ -1,7 +1,7 @@
 import { Log, UserManager} from "../../../../src";
 
 Log.setLogger(console);
-Log.setLevel(Log.INFO);
+Log.setLevel(Log.DEBUG);
 
 const url = window.location.origin + "/user-manager";
 

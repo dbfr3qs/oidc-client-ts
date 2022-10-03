@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "express": "^4.18.1",
-    "jsrsasign": "^10.5.25"
+    "jsrsasign": "^10.5.25",
+    "oidc-client": "^1.11.5"
   },
   "devDependencies": {
     "concurrently": "^7.2.1",
