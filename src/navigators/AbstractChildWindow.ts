@@ -38,12 +38,24 @@ export abstract class AbstractChildWindow implements IWindow {
             const listener = (e: MessageEvent) => {
                 const data: MessageData | undefined = e.data;
                 const origin = params.scriptOrigin ?? window.location.origin;
-                if (e.origin !== origin || data?.source !== messageSource) {
+                let newData: MessageData;
+
+                if (!data?.url) {
+                    newData = {
+                        url: data as unknown as string,
+                        source: messageSource,
+                        keepOpen: false,
+                    };
+                } else {
+                    newData = data;
+                }
+
+                if (e.origin !== origin || newData?.source !== messageSource) {
                     // silently discard events not intended for us
                     return;
                 }
                 try {
-                    const state = UrlUtils.readParams(data.url, params.response_mode).get("state");
+                    const state = UrlUtils.readParams(newData.url, params.response_mode).get("state");
                     if (!state) {
                         logger.warn("no state found in response url");
                     }
@@ -57,7 +69,7 @@ export abstract class AbstractChildWindow implements IWindow {
                     this._dispose();
                     reject(new Error("Invalid response from window"));
                 }
-                resolve(data);
+                resolve(newData);
             };
             window.addEventListener("message", listener, false);
             this._disposeHandlers.add(() => window.removeEventListener("message", listener, false));
