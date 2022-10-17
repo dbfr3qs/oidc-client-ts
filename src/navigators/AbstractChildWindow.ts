@@ -38,9 +38,16 @@ export abstract class AbstractChildWindow implements IWindow {
             const listener = (e: MessageEvent) => {
                 const data: MessageData | undefined = e.data;
                 const origin = params.scriptOrigin ?? window.location.origin;
-                let newData: MessageData;
+                let newData: MessageData | undefined;
 
-                if (!data?.url) {
+                // ugh. because of the way the IFrame logic is implemented in oidc-client-js, we have to do some extreme hackery to validate that any
+                // postMessages are actually for us. E.g. if the message comes from v1 the data should be a string with a code in it that is obviously a url
+                // if it comes from oidc-client-ts the check is much easier
+                if (typeof data === "string" && !(data as unknown as string).includes("code=") && !(((data as unknown as string).startsWith("http://") || (data as unknown as string).startsWith("https://")))) {
+                    return;
+                }
+
+                if (!data?.url && typeof data === "string") {
                     newData = {
                         url: data as unknown as string,
                         source: messageSource,
