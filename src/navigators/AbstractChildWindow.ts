@@ -36,20 +36,17 @@ export abstract class AbstractChildWindow implements IWindow {
 
         const { url, keepOpen } = await new Promise<MessageData>((resolve, reject) => {
             const listener = (e: MessageEvent) => {
-                const data: MessageData | undefined = e.data;
+                const data: MessageData | string | undefined = e.data;
                 const origin = params.scriptOrigin ?? window.location.origin;
-                let newData: MessageData | undefined;
+                let newData: MessageData | string | undefined;
 
-                // ugh. because of the way the IFrame logic is implemented in oidc-client-js, we have to do some extreme hackery to validate that any
-                // postMessages are actually for us. E.g. if the message comes from v1 the data should be a string with a code in it that is obviously a url
-                // if it comes from oidc-client-ts the check is much easier
-                if (typeof data === "string" && !(data as unknown as string).includes("code=") && !(((data as unknown as string).startsWith("http://") || (data as unknown as string).startsWith("https://")))) {
-                    return;
-                }
-
-                if (!data?.url && typeof data === "string") {
+                // ugh. because of the way the IFrame logic is implemented in oidc-client-js, we have to do some hackery to validate that any
+                // postMessages are actually for us in the case that they may originate from oidc-client-js, and not some other listener on the page.
+                // If they are, and they look to have been sent by oidc-client-js, then we need to munge the data received into a shape that
+                // oidc-client-ts can understand.
+                if (typeof data === "string" && data.includes(".html?code=") && (data.startsWith("http://") || (data.startsWith("https://")))) {
                     newData = {
-                        url: data as unknown as string,
+                        url: data,
                         source: messageSource,
                         keepOpen: false,
                     };
@@ -57,12 +54,12 @@ export abstract class AbstractChildWindow implements IWindow {
                     newData = data;
                 }
 
-                if (e.origin !== origin || newData?.source !== messageSource) {
+                if (e.origin !== origin || (newData as MessageData)?.source !== messageSource) {
                     // silently discard events not intended for us
                     return;
                 }
                 try {
-                    const state = UrlUtils.readParams(newData.url, params.response_mode).get("state");
+                    const state = UrlUtils.readParams((newData as MessageData).url, params.response_mode).get("state");
                     if (!state) {
                         logger.warn("no state found in response url");
                     }
@@ -76,7 +73,7 @@ export abstract class AbstractChildWindow implements IWindow {
                     this._dispose();
                     reject(new Error("Invalid response from window"));
                 }
-                resolve(newData);
+                resolve(newData as MessageData);
             };
             window.addEventListener("message", listener, false);
             this._disposeHandlers.add(() => window.removeEventListener("message", listener, false));

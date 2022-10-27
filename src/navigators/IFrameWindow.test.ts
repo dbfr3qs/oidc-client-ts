@@ -152,6 +152,52 @@ describe("IFrameWindow", () => {
                 await expect(frameWindow.navigate({ state: fakeState, url: fakeUrl })).rejects.toThrowError("Invalid response from window");
             });
 
+            it("should resolve the promise if the data is just a url in string format with a code", async () => {
+                navigateParamsStub.mockReturnValue({ ...validNavigateParams, data: "https://oidc-provider.com/silent.html?code=1234" });
+                const frameWindow = new IFrameWindow({});
+                await expect(frameWindow.navigate({ state: fakeState, url: fakeUrl })).resolves.not.toThrow();
+            });
+
+            it("should not resolve the promise if the data is just a url in string format without a code", async () => {
+                let promiseDone = false;
+                navigateParamsStub.mockReturnValue({ ...validNavigateParams, data: "https://oidc-provider.com" });
+                const frameWindow = new IFrameWindow({});
+                const promise = frameWindow.navigate({ state: fakeState, url: fakeUrl });
+
+                promise.finally(() => promiseDone = true);
+                await flushPromises();
+
+                expect(promiseDone).toBe(false);
+            });
+
+            it("should not resolve the promise if the data is a string, but not a url with a code in it", async () => {
+                let promiseDone = false;
+                navigateParamsStub.mockReturnValue({ ...validNavigateParams, data: "sadfgdfhgeret3443254325324sdafgs" });
+                const frameWindow = new IFrameWindow({});
+                const promise = frameWindow.navigate({ state: fakeState, url: fakeUrl });
+
+                promise.finally(() => promiseDone = true);
+                await flushPromises();
+
+                expect(promiseDone).toBe(false);
+            });
+
+            it("should not resolve the promise if the data is not a string and does not have a source value", async () => {
+                let promiseDone = false;
+                const invalidData = {
+                    data: { random: "data",
+                        url: `https://test.com?state=${fakeState}` },
+                };
+                navigateParamsStub.mockReturnValue({ ...validNavigateParams, data: { ...invalidData.data } });
+                const frameWindow = new IFrameWindow({});
+                const promise = frameWindow.navigate({ state: fakeState, url: fakeUrl });
+
+                promise.finally(() => promiseDone = true);
+                await flushPromises();
+
+                expect(promiseDone).toBe(false);
+            });
+
             it("and args source with state do not match contentWindow should never resolve", async () => {
                 let promiseDone = false;
                 navigateParamsStub.mockReturnValue({ ...validNavigateParams, source: {} });
