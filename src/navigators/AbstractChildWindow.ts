@@ -44,7 +44,7 @@ export abstract class AbstractChildWindow implements IWindow {
                 // postMessages are actually for us in the case that they may originate from oidc-client-js, and not some other listener on the page.
                 // If they are, and they look to have been sent by oidc-client-js, then we need to munge the data received into a shape that
                 // oidc-client-ts can understand.
-                if (typeof data === "string" && data.includes(".html?code=") && (data.startsWith("http://") || (data.startsWith("https://")))) {
+                if (typeof data === "string" && (data.includes(".html?code=") || data.includes("error=login_required")) && (data.startsWith("http://") || (data.startsWith("https://")))) {
                     newData = {
                         url: data,
                         source: messageSource,

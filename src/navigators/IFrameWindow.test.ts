@@ -158,6 +158,12 @@ describe("IFrameWindow", () => {
                 await expect(frameWindow.navigate({ state: fakeState, url: fakeUrl })).resolves.not.toThrow();
             });
 
+            it("should resolve the promise if the data is just a url in string format with a login error", async () => {
+                navigateParamsStub.mockReturnValue({ ...validNavigateParams, data: "https://oidc-provider.com/silent.html?error=login_required&state=dbd953a298164838a600e1fdd2107929&session_state=iZU0VwjzbjABh2_LBUKLDPG3ad1nPnD6F0mr4_m83-8.QqT88qIHfR31_l2AvoNt2g" });
+                const frameWindow = new IFrameWindow({});
+                await expect(frameWindow.navigate({ state: fakeState, url: fakeUrl })).resolves.not.toThrow();
+            });
+
             it("should not resolve the promise if the data is just a url in string format without a code", async () => {
                 let promiseDone = false;
                 navigateParamsStub.mockReturnValue({ ...validNavigateParams, data: "https://oidc-provider.com" });
