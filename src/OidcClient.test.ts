@@ -13,6 +13,7 @@ import { SignoutRequest } from "./SignoutRequest";
 import { SignoutResponse } from "./SignoutResponse";
 import { RefreshState } from "./RefreshState";
 import { SigninResponse } from "./SigninResponse";
+import type { UserProfile } from "./User";
 
 describe("OidcClient", () => {
     let subject: OidcClient;
@@ -347,6 +348,7 @@ describe("OidcClient", () => {
                 id_token: "id_token",
                 session_state: "session_state",
                 scope: "openid",
+                profile: {} as UserProfile,
             });
 
             // act
@@ -371,6 +373,7 @@ describe("OidcClient", () => {
                 id_token: "id_token",
                 session_state: "session_state",
                 scope: "openid",
+                profile: {} as UserProfile,
             });
 
             // act
@@ -380,6 +383,8 @@ describe("OidcClient", () => {
             expect(exchangeRefreshTokenMock).toHaveBeenCalledWith( {
                 refresh_token: "refresh_token",
                 scope: "openid",
+                timeoutInSeconds: undefined,
+                refreshTokenCredentials: "same-origin",
             });
             expect(response).toBeInstanceOf(SigninResponse);
             expect(response).toMatchObject(tokenResponse);
@@ -408,6 +413,7 @@ describe("OidcClient", () => {
                 id_token: "id_token",
                 session_state: "session_state",
                 scope: "openid",
+                profile: {} as UserProfile,
             });
 
             // act
