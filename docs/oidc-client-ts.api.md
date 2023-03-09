@@ -95,6 +95,9 @@ export type CreateSignoutRequestArgs = Omit<SignoutRequestArgs, "url" | "state_d
     state?: unknown;
 };
 
+// @public (undocumented)
+export type CustomHeader = string | (() => string);
+
 // @public
 export class ErrorResponse extends Error {
     constructor(args: {
@@ -343,6 +346,7 @@ export interface OidcClientSettings {
     client_secret?: string;
     // @deprecated (undocumented)
     clockSkewInSeconds?: number;
+    customHeaders?: Record<string, CustomHeader>;
     disablePKCE?: boolean;
     display?: string;
     extraQueryParams?: Record<string, string | number | boolean>;
@@ -378,7 +382,7 @@ export interface OidcClientSettings {
 
 // @public
 export class OidcClientSettingsStore {
-    constructor({ authority, metadataUrl, metadata, signingKeys, metadataSeed, client_id, client_secret, response_type, scope, redirect_uri, post_logout_redirect_uri, client_authentication, prompt, display, max_age, ui_locales, acr_values, resource, response_mode, filterProtocolClaims, loadUserInfo, staleStateAgeInSeconds, clockSkewInSeconds, userInfoJwtIssuer, mergeClaims, disablePKCE, stateStore, refreshTokenCredentials, revokeTokenAdditionalContentTypes, fetchRequestCredentials, refreshTokenAllowedScope, extraQueryParams, extraTokenParams, }: OidcClientSettings);
+    constructor({ authority, metadataUrl, metadata, signingKeys, metadataSeed, client_id, client_secret, response_type, scope, redirect_uri, post_logout_redirect_uri, client_authentication, prompt, display, max_age, ui_locales, acr_values, resource, response_mode, filterProtocolClaims, loadUserInfo, staleStateAgeInSeconds, clockSkewInSeconds, userInfoJwtIssuer, mergeClaims, disablePKCE, stateStore, refreshTokenCredentials, revokeTokenAdditionalContentTypes, fetchRequestCredentials, refreshTokenAllowedScope, extraQueryParams, extraTokenParams, customHeaders, }: OidcClientSettings);
     // (undocumented)
     readonly acr_values: string | undefined;
     // (undocumented)
@@ -391,6 +395,8 @@ export class OidcClientSettingsStore {
     readonly client_secret: string | undefined;
     // (undocumented)
     readonly clockSkewInSeconds: number;
+    // (undocumented)
+    readonly customHeaders: Record<string, CustomHeader>;
     // (undocumented)
     readonly disablePKCE: boolean;
     // (undocumented)
