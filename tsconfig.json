@@ -16,6 +16,8 @@
     "skipLibCheck": true,
     // error out if import and file system have a casing mismatch. Recommended by TS
     "forceConsistentCasingInFileNames": true,
+    // ensure type imports are side-effect free by enforcing that `import type` is used
+    "verbatimModuleSyntax": true,
     // prevent the use of features that are incompatible with isolated transpilation
     "isolatedModules": true,
   },
