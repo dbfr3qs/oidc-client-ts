@@ -8,9 +8,8 @@
     "server": "node ./server.js"
   },
   "dependencies": {
-    "express": "^4.18.1",
-    "jsrsasign": "^10.5.25",
-    "oidc-client": "^1.11.5"
+    "express": "^4.18.2",
+    "jsrsasign": "^11.0.0"
   },
   "devDependencies": {
     "concurrently": "^7.5.0",
